@@ -1,0 +1,13 @@
+query products($input: ProductsInput) {
+    products(input: $input) {
+        description
+        image {
+            url
+            fallbackUrl
+        }
+        price {
+            currency
+            amount
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "SQL_SERVER": "gmd-test-server.database.windows.net",
+    "SQL_PORT": "1433",
+    "SQL_DATABASE": "IProcessor_test",
+    "SQL_USERNAME": "gmdUser",
+    "SQL_PASSWORD": "Outwest1600test",
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=productparsersa;AccountKey=5/ZUdzbdSJolD7zD0l01GNef5BO61yi5fZTK6xDtR9paDvbJ5O2X+acRTsxaT/rggMDVzrNF7o1t+VUhctzUZA==;EndpointSuffix=core.windows.net",
+    "FUNCTIONS_EXTENSION_VERSION": "~3",
+    "DOCKER_REGISTRY_SERVER_URL": "https://mcr.microsoft.com",
+    "DOCKER_REGISTRY_SERVER_USERNAME": "",
+    "DOCKER_REGISTRY_SERVER_PASSWORD": "",
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE": "false",
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "DefaultEndpointsProtocol=https;AccountName=productparsersa;AccountKey=5/ZUdzbdSJolD7zD0l01GNef5BO61yi5fZTK6xDtR9paDvbJ5O2X+acRTsxaT/rggMDVzrNF7o1t+VUhctzUZA==;EndpointSuffix=core.windows.net",
+    "SCRAPING_API": "https://gmdstagingapp.azurewebsites.net/api/system?code=TqgF9vW2/ckInrUqa7cFHUnGkCDstRpFxa5m1riTE9rr1D1DSocMUA=="
+  },
+  "ConnectionStrings": {}
+}

@@ -1,0 +1,13 @@
+{
+  "disabled": false,
+  "bindings": [
+    {
+      "schedule": "0 0 4 */1 * *",
+      "name": "myTimer",
+      "type": "timerTrigger",
+      "direction": "in",
+      "runOnStartup": "false"
+    }
+  ],
+  "scriptFile": "../dist/reporting/reporting.js"
+}

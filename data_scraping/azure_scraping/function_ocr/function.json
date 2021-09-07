@@ -1,0 +1,12 @@
+{
+  "scriptFile": "function_ocr.py",
+  "bindings": [
+    {
+      "name": "blob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "documents/{BlobName}",
+      "connection": "AZURE_STORAGE_ACCOUNT"
+    }
+  ]
+}

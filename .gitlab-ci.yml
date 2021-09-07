@@ -1,0 +1,190 @@
+stages:
+  - build_environment
+  - build
+  - test
+  - deploy
+
+#cache:
+#  key: "$CI_COMMIT_REF_SLUG"
+#  paths:
+#    - node_modules
+#    - .pip
+#    - /var/lib/docker/volumes
+#    - yarn.lock
+#    - data_processing/packages/gmd-frontend/.next
+
+# build
+
+build_environment:
+  stage: build_environment
+  image: docker:19.03.12
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+      changes:
+        - Dockerfile
+  services:
+    - docker:19.03.12-dind
+  variables:
+    IMAGE_NAME: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $IMAGE_NAME:environment || true
+    - docker build
+      --target environment
+      --cache-from $IMAGE_NAME:environment
+      --tag $IMAGE_NAME:environment .
+    - docker push $IMAGE_NAME:environment
+
+build:
+  image: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG:environment
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
+  artifacts:
+    untracked: true
+  script:
+    - export NEXT_PUBLIC_API_ENDPOINT=$NEXT_PUBLIC_API_ENDPOINT
+    - yarn install
+    - yarn test
+    - pip install --cache-dir ./.pip -e .
+    - pytest
+
+# integration testing
+# could not be run on production, cuz there is no access to production db
+
+test-intergration:
+  image: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG:environment
+  stage: test
+  environment:
+    name: staging/any
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH != "deployment"
+  dependencies:
+    - build
+  script:
+    - yarn install
+    - yarn test:integration:jest
+    - pip install --cache-dir ./.pip -e .
+    - pytest -m integtest
+    - scrapy check
+
+# deployment
+
+.job_template: &deploy_azure_parsers
+  image: docker:19.03.12
+  stage: deploy
+  services:
+    - docker:19.03.12-dind
+  variables:
+    IMAGE_NAME: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG
+  dependencies:
+    - build
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $IMAGE_NAME:environment || true
+    - docker pull $IMAGE_NAME:azure_parsers || true
+    - docker build
+      --target azure_parsers
+      --cache-from $IMAGE_NAME:environment
+      --cache-from $IMAGE_NAME:azure_parsers
+      --tag $IMAGE_NAME:azure_parsers .
+    - docker push $IMAGE_NAME:azure_parsers
+    - apk add --update curl && which curl
+    - curl -X POST "https://\$$AZURE_WEBHOOK_TOKEN" -d -H
+
+deploy_azure_production_parsers:
+  <<: *deploy_azure_parsers
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "deployment"
+  environment:
+    name: production/azure_parsers
+
+deploy_azure_staging_parsers:
+  <<: *deploy_azure_parsers
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"
+  environment:
+    name: staging/azure_parsers
+
+.azure_app_job_template: &deploy_azure_app
+  image: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG:environment
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - yarn install
+    - export GMD_APP_NAME=$GMD_APP_NAME
+    - echo $GMD_APP_NAME
+    - export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+    - az login $(echo $AZURE_CREDENTIALS | base64 --decode) >/dev/null
+    - cd ./data_processing/packages/gmd-backend && ls -al && yarn deploy
+
+deploy_azure_production_app:
+  <<: *deploy_azure_app
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "deployment"
+  environment:
+    name: production/azure_app
+
+deploy_azure_staging_app:
+  <<: *deploy_azure_app
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"
+  environment:
+    name: staging/azure_app
+
+.azure_frontend_job_template: &deploy_azure_frontend
+  image: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG:environment
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - yarn install
+    - export AZURE_STORAGE_ACCOUNT=$AZURE_STORAGE_ACCOUNT
+    - export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+    - az login $(echo $AZURE_CREDENTIALS | base64 --decode) >/dev/null
+    - cd ./data_processing/packages/gmd-frontend && yarn deploy
+
+deploy_azure_production_fontend:
+  <<: *deploy_azure_frontend
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "deployment"
+  environment:
+    name: production/azure_frontend
+
+deploy_azure_staging_frontend:
+  <<: *deploy_azure_frontend
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "dev"
+  environment:
+    name: staging/azure_frontend
+
+deploy_spiders:
+  environment:
+    name: production/zyte
+  image: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG:environment
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "deployment"
+  dependencies:
+    - build
+  script:
+    - echo -e "SCRAPING_API=\"${SCRAPING_API}\"\n$(cat ./data_scraping/gmd/settings.py)" > ./data_scraping/gmd/settings.py
+    - echo -e "APPLICATIONINSIGHTS_CONNECTION_STRING=\"${APPLICATIONINSIGHTS_CONNECTION_STRING}\"\n$(cat ./data_scraping/gmd/settings.py)" > ./data_scraping/gmd/settings.py
+    - pip install --cache-dir ./.pip -e .
+    - export SHUB_APIKEY=$SHUB_APIKEY
+    - shub deploy 516631
+
+run_spiders:
+  environment:
+    name: production/zyte
+  image: registry.gitlab.com/engaging/scrapy/$CI_COMMIT_REF_SLUG:environment
+  stage: deploy
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "deployment"
+  dependencies:
+    - build
+  script:
+    - pip install --cache-dir ./.pip -e .
+    - export SHUB_APIKEY=$SHUB_APIKEY
+    - run_spiders -p 516631

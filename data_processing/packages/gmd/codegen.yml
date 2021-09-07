@@ -1,0 +1,18 @@
+schema:
+  - src/common/application/graphqlAppSchema.ts
+documents:
+  - src/**/*.graphql
+config:
+  scalars:
+    Currency: "../../../domain/value-objects/Money#Currency"
+generates:
+  src/common/application/types/build/gqltypes.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-resolvers
+      - typescript-react-query
+    config:
+      typesSuffix: GQL
+      noSchemaStitching: true
+      enumsAsTypes: true

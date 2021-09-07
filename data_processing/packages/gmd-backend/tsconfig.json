@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig",
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2018",
+    "lib": [
+      "es2018",
+      "DOM"
+    ],
+    "outDir": "dist",
+    "sourceMap": true,
+    "noEmit": false
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
+}

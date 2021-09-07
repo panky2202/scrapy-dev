@@ -1,0 +1,6 @@
+mutation missingProducts($input: AddMissingProductInput) {
+    addMissingProducts(input: $input) {
+        success
+        message
+    }
+}

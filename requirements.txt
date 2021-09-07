@@ -1,0 +1,27 @@
+scrapy==2.5.0
+furl==2.1.1
+pydantic==1.8.1
+jsondiff==1.2.0
+scrapy-selenium==0.0.7
+beautifulsoup4==4.9.3
+shub==2.13.0
+pdf2image==1.14.0
+pymssql==2.2.1
+azure-cognitiveservices-vision-computervision==0.8.0
+azure-common==1.1.27
+azure-core==1.15.0
+azure-functions==1.7.2
+azure-storage-blob==12.8.0
+extract-msg==0.28.7
+pandas
+pytest
+pytest-pylint
+gql==3.0.0a5
+openpyxl >= 1.0.0
+pyzbar==0.1.8
+xlrd >= 1.0.0
+opencensus==0.7.13
+opencensus-context==0.1.2
+opencensus-ext-azure==1.0.8
+pytest-xdist
+

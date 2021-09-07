@@ -1,0 +1,22 @@
+{
+  "name": "@engaging-enterprises/basic-utils",
+  "version": "1.4.0",
+  "private": true,
+  "files": [
+    "src"
+  ],
+  "main": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {
+    "apollo": "2.31.1",
+    "numbro": "^2.3.2"
+  },
+  "devDependencies": {
+    "react": "16.13.1"
+  },
+  "peerDependencies": {
+    "apollo": "2.31.1",
+    "react": "16.13.1"
+  }
+}

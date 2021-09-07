@@ -1,0 +1,95 @@
+{
+  "name": "root",
+  "private": true,
+  "maintainers": [
+    {
+      "name": "Aleksey Kozin",
+      "email": "cirnotoss@gmail.com"
+    }
+  ],
+  "scripts": {
+    "postinstall": "yarn build",
+    "build": "lerna run build",
+    "bump": "lerna version --conventional-commits --no-commit-hooks --no-push",
+    "nuke": "find . \\( -name 'node_modules' -or -name '.next' -or -name 'package-lock.json' -or -name 'yarn.lock' -or -name 'yarn.json' -or -name 'build' -or -name '.cache' -or -name '.webpack_cache' -or -name 'dist' -or -name '.gradle' -or -name 'Pods' -or -name 'Podfile.lock' \\) -prune -print -exec rm -rf '{}' \\; && rm -rf \"${HOME}/Library/Caches/CocoaPods\" && killall node && rm -rf /tmp/metro-*",
+    "test:jest": "jest --config ./jest.config.js --colors --passWithNoTests",
+    "test:integration:jest": "jest --config ./jest.integration.config.js --colors --runInBand",
+    "test:tsc": "tsc --noEmit",
+    "test": "yarn test:tsc && yarn test:jest",
+    "prepare": "husky install",
+    "osx:report:weekly": "_GIT_SINCE=$(date -j -v-7d +%Y-%m-%d) git-quick-stats -T"
+  },
+  "workspaces": {
+    "packages": [
+      "data_processing/packages/*"
+    ],
+    "nohoist": []
+  },
+  "resolutions": {
+    "@azure/functions": "1.2.3",
+    "react": "16.13.1",
+    "typescript": "4.2.3",
+    "graphql": "14.7.0",
+    "graphql-tools": "4.0.0",
+    "apollo": "2.31.1",
+    "@apollo/client": "3.3.6",
+    "apollo-server-express": "2.7.0",
+    "@graphql-codegen/typescript": "1.19.0",
+    "@graphql-codegen/typescript-operations": "1.17.12",
+    "@graphql-codegen/typescript-react-apollo": "2.2.1",
+    "@graphql-codegen/typescript-resolvers": "1.18.0",
+    "@graphql-codegen/cli": "1.19.4",
+    "graphql-subscriptions": "1.1.0",
+    "express": "4.17.1",
+    "yup": "0.32.1",
+    "lodash": "4.17.20",
+    "next": "^10.0.0",
+    "react-dom": "16.13.1",
+    "next-transpile-modules": "^6.3.0",
+    "zbar.wasm": "^2.0.3"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.4",
+    "@babel/runtime": "^7.8.4",
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@octokit/core": "^3.2.1",
+    "@testing-library/react-hooks": "^3.7.0",
+    "@types/jest": "^26.0.14",
+    "@types/lodash": "^4.14.161",
+    "@types/react-test-renderer": "^16.9.2",
+    "@typescript-eslint/eslint-plugin": "4.9.1",
+    "@typescript-eslint/parser": "4.9.1",
+    "babel-jest": "^26.3.0",
+    "eslint": "^7.15.0",
+    "eslint-plugin-jest": "^24.0.2",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.23.2",
+    "husky": "^7.0.0",
+    "jest": "^26.4.2",
+    "jest-transform-stub": "^2.0.0",
+    "lerna": "^3.22.1",
+    "metro-config": "^0.64.0",
+    "next": "^10.0.0",
+    "next-transpile-modules": "^6.3.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "react-test-renderer": "16.13.1",
+    "run-script-os": "^1.1.6",
+    "ts-jest": "^26.4.0",
+    "typescript": "4.2.3",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "zbar.wasm": "^2.0.3",
+    "prettier": "^2.3.2",
+    "dotenv": "^8.6.0"
+  },
+  "jest": {
+    "verbose": true,
+    "config": "./jest.config.js",
+    "colors": true,
+    "testEnvironment": "node"
+  },
+  "dependencies": {
+    "yarn": "^1.22.10"
+  }
+}

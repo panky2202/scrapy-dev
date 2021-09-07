@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "name": "blob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "documents/{vendorDisplayName}/IMAGE/{itemNumber}.{extension}",
+      "connection": "AzureWebJobsStorage"
+    }
+  ],
+  "scriptFile": "../dist/vendor-images-pipeline/vendor-images-pipeline.js"
+}

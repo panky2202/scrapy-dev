@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json.schemastore.org/proxies",
+  "proxies": {
+    "Local Static frontend on Azure Storage": {
+      "matchCondition": {
+        "route": "/dev/{*restOfPath}"
+      },
+      "backendUri": "http://localhost:3000/{restOfPath}"
+    },
+    "Local Azure Functions API": {
+      "matchCondition": {
+        "route": "/dev/api/graphql"
+      },
+      "backendUri": "http://localhost:7071/api/graphql"
+    },
+    "Static frontend on Azure Storage": {
+      "matchCondition": {
+        "route": "/{*restOfPath}"
+      },
+      "backendUri": "https://%BLOB_HOST%/{restOfPath}"
+    },
+    "Azure Functions API": {
+      "matchCondition": {
+        "route": "/api/{*restOfPath}"
+      },
+      "backendUri": "https://%APP_HOST%/api/{restOfPath}"
+    }
+  }
+}
